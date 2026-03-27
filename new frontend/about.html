@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CropGuard Knowledge Hub</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+    scroll-behavior:smooth;
+}
+
+body{
+    background:linear-gradient(135deg,#0b2e22,#14532d);
+    color:white;
+    overflow-x:hidden;
+    font-size:18px;
+}
+
+/* NAV */
+nav{
+    position:fixed;
+    width:100%;
+    top:0;
+    display:flex;
+    justify-content:space-between;
+    padding:15px 50px;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+    z-index:1000;
+}
+
+nav h2{
+    font-size:clamp(20px,3vw,30px);
+}
+
+nav a{
+    color:white;
+    margin-left:20px;
+    text-decoration:none;
+    font-size:clamp(14px,2vw,18px);
+}
+
+/* HERO */
+.hero{
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:
+    linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+    url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') center/cover;
+}
+
+.hero h1{
+    font-size:clamp(40px,6vw,80px);
+    font-weight:700;
+    background: linear-gradient(90deg, #4ade80, #22c55e, #16a34a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(34,197,94,0.6);
+}
+
+.hero p{
+    margin-top:20px;
+    max-width:700px;
+    font-size:clamp(16px,2vw,22px);
+    opacity:0;
+    animation:fadeUp 1s ease forwards 0.5s;
+}
+
+/* SECTION */
+.section{
+    padding:100px 60px;
+}
+
+/* FLEX */
+.flex{
+    display:flex;
+    gap:40px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+/* TEXT */
+.text{
+    flex:1;
+}
+
+.text h2{
+    font-size:clamp(28px,4vw,45px);
+    margin-bottom:20px;
+    text-shadow: 0 0 10px rgba(34,197,94,0.4);
+}
+
+.text p{
+    opacity:0.85;
+    line-height:1.7;
+    font-size:clamp(16px,2vw,20px);
+}
+
+/* IMAGE */
+.image{
+    flex:1;
+}
+
+.image img{
+    width:100%;
+    border-radius:20px;
+}
+
+/* CARDS */
+.cards{
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.card{
+    width:260px;
+    padding:25px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(10px);
+    transition:0.3s;
+    font-size:18px;
+}
+
+.card:hover{
+    transform:translateY(-10px) scale(1.03);
+    box-shadow: 0 0 25px rgba(34,197,94,0.4);
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.grid img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+    border-radius:20px;
+}
+
+/* ANIMATION */
+.hidden{
+    opacity:0;
+    transform:translateY(50px);
+    transition:all 0.8s ease;
+}
+
+.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    .section{
+        padding:80px 20px;
+    }
+
+    nav{
+        padding:15px 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+    <h2>🌿 CropGuard</h2>
+    <div>
+        <a href="#about">About</a>
+        <a href="#diseases">Diseases</a>
+        <a href="#impact">Impact</a>
+        <a href="#ai">AI</a>
+        <a href="#designer">Team</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div>
+      <h1>🌿 CropGuard</h1>
+        <p>
+        Learn everything about plant diseases, crop loss, and how AI is transforming agriculture.
+        </p>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section hidden" id="about">
+    <div class="flex">
+        <div class="text">
+            <h2>What are Crop Diseases?</h2>
+            <p>
+            Crop diseases are caused by fungi, bacteria, viruses, and environmental stress.
+            They reduce yield, damage quality, and threaten food security worldwide.
+            </p>
+        </div>
+        <div class="image">
+            <img src="https://images.unsplash.com/photo-1598514982841-6b4b63b31589">
+        </div>
+    </div>
+</section>
+
+<!-- TYPES -->
+<section class="section hidden" id="diseases">
+    <h2 style="text-align:center;">Types of Crop Diseases</h2>
+
+    <div class="cards">
+        <div class="card">🦠 Fungal Diseases (Rust, Blight)</div>
+        <div class="card">🧬 Bacterial Diseases</div>
+        <div class="card">🧫 Viral Infections</div>
+        <div class="card">🌡 Environmental Stress</div>
+    </div>
+</section>
+
+<!-- IMPACT -->
+<section class="section hidden" id="impact">
+    <h2 style="text-align:center;">Global Impact</h2>
+
+    <div class="flex">
+        <div class="text">
+            <p>
+            Crop diseases cause 30–40% global yield loss annually,
+            costing billions of dollars and threatening food supply chains.
+            </p>
+        </div>
+
+        <div class="image">
+            <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3">
+        </div>
+    </div>
+</section>
+
+<!-- AI -->
+<section class="section hidden" id="ai">
+    <div class="flex">
+        <div class="image">
+            <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449">
+        </div>
+
+        <div class="text">
+            <h2>AI in Agriculture</h2>
+            <p>
+            AI can detect diseases instantly using image recognition,
+            helping farmers take action before crops are damaged.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- IMAGES -->
+<section class="section hidden">
+    <h2 style="text-align:center;">Infected Crops</h2>
+
+    <div class="grid">
+        <img src="https://images.unsplash.com/photo-1560493676-04071c5f467b">
+        <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449">
+        <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3">
+    </div>
+</section>
+
+<!-- DESIGNER SECTION -->
+<section class="section hidden" id="designer">
+    <h2 style="text-align:center;">Design & Development</h2>
+
+    <div class="cards" style="margin-top:40px;">
+        <div class="card" style="text-align:center;">
+            <h3>🌿 AgriNova</h3>
+            <p style="margin-top:10px; opacity:0.8;">
+                This website is designed by <b>AgriNova</b>
+            </p>
+        </div>
+
+        <div class="card" style="text-align:center;">
+            <h3>👨‍💻 Developers</h3>
+            <p style="margin-top:10px; opacity:0.8;">
+                Aryan Ratan<br>
+                Purab Chouhan<br>
+                Kritiman Mishra<br>
+                Archit Bhattacharjee
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SCRIPT -->
+<script>
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+        if(entry.isIntersecting){
+            entry.target.classList.add('show');
+        }
+    });
+});
+
+document.querySelectorAll('.hidden').forEach(el=>{
+    observer.observe(el);
+});
+</script>
+
+</body>
+</html>
