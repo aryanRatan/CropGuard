@@ -180,7 +180,7 @@ margin:auto;
 </section>
 
 <script>
-    function changeLanguage(){
+    window.changeLanguage = function(){
 
 const lang = document.getElementById("languageSelect").value;
 
@@ -206,7 +206,7 @@ document.querySelectorAll(".section h2")[1].innerText = content[lang].upload;
 document.querySelector("#about p").innerText = content[lang].about;
 
 }
-function previewImage(){
+window.previewImage = function(){
     const file = document.getElementById("fileInput").files[0];
     const preview = document.getElementById("preview");
     if (file){
@@ -215,7 +215,7 @@ function previewImage(){
     }
 }
 
-async function analyzeImage(){
+window.analyzeImage = async function(){
 
 const result=document.getElementById('result');
 const file=document.getElementById('fileInput').files[0];
@@ -224,7 +224,7 @@ if(!file){
 alert("Please upload an image");
 return;
 }
-function startVoice(){
+window.startVoice = function(){
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 
 recognition.lang = "en-IN";
@@ -263,17 +263,20 @@ if(lang === "hi"){
 }
 async function translateToHindi(text){
     try{
+        let formData = new FormData();
+        formData.append("text", "Translate to Hindi: " + text);
+
         const res = await fetch("https://cropguard-5.onrender.com/predict", {
             method: "POST",
-            body: new FormData().append("text", "Translate to Hindi: " + text)
+            body: formData
         });
+
         const data = await res.json();
         return data.result || text;
     }catch{
         return text;
     }
 }
-
 function getSection(name){
 const regex=new RegExp(name+":([\\s\\S]*?)(?=\\n[A-Z]|$)");
 const match=text.match(regex);
@@ -321,7 +324,7 @@ result.innerHTML="❌ Error connecting to backend";
 }
 
 /* ✅ NEW SEARCH FUNCTION */
-async function searchDisease(){
+window.searchDisease = async function(){
 
 const result=document.getElementById('result');
 const text=document.getElementById('searchInput').value;
@@ -359,16 +362,16 @@ const data=await response.json();
 const output=data.details || data.result;
 
 // 🔥 Convert to cards
-const diseases = output.split("Disease:") : [];
+const diseases = output ? output.split("Disease:") : [];
 
 let html = "";
 
 diseases.forEach(d => {
-if(d.trim()){
-html += `
-<div class="result-card">
-<h3>🌿 ${d.split("\n")[0]}</h3>
-<p>${d.replace(/\n/g,"<br>")}</p>
+  if(d.trim()){
+    html += `
+    <div class="result-card">
+         <h3>🌿 ${d.split("\n")[0]}</h3>
+         <p>${d.replace(/\n/g,"<br>")}</p>
 </div>
 `;
 }
