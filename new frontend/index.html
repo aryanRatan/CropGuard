@@ -12,10 +12,9 @@
 
 body{
 background:linear-gradient(135deg,#0f3d2e,#1b5e20);
-color:white;
+color:rgb(0, 0, 0);
 }
 
-/* NAV */
 nav{
 position:sticky;top:0;
 display:flex;justify-content:space-between;
@@ -25,9 +24,8 @@ backdrop-filter:blur(10px)
 }
 
 nav h2{display:flex;align-items:center;gap:10px}
-nav a{color:white;margin-left:20px;text-decoration:none}
+nav a{color:rgb(0, 0, 0);margin-left:20px;text-decoration:none}
 
-/* HERO */
 .hero{
 height:90vh;
 display:flex;flex-direction:column;
@@ -36,10 +34,10 @@ text-align:center;
 background:url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') center/cover;
 }
 
-/* SEARCH */
+/* ✅ UPDATED SEARCH */
 .search-box{
 display:flex;
-background:white;
+background:rgb(162, 220, 112);
 border-radius:50px;
 padding:10px 20px;
 width:60%;
@@ -47,10 +45,8 @@ color:black;
 }
 .search-box input{border:none;flex:1;outline:none}
 
-/* SECTIONS */
 .section{padding:60px 40px;text-align:center}
 
-/* CARDS */
 .cards{display:flex;gap:20px;justify-content:center}
 .card{
 background:rgba(255,255,255,0.1);
@@ -59,7 +55,6 @@ border-radius:20px;
 width:250px
 }
 
-/* UPLOAD */
 .upload{
 border:2px dashed white;
 padding:40px;
@@ -79,7 +74,6 @@ color:white;
 cursor:pointer
 }
 
-/* RESULT CARDS */
 #result{
 margin-top:30px;
 display:grid;
@@ -119,6 +113,13 @@ margin-top:20px;
 
 <section class="hero" id="home">
 <h1>Your Smart Crop Health Assistant</h1>
+
+<!-- ✅ UPDATED SEARCH BAR -->
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search crop problems, diseases, or plant issues...">
+<button onclick="searchDisease()">🔍</button>
+</div>
+
 </section>
 
 <section class="section">
@@ -157,6 +158,7 @@ function previewImage(){
         preview.style.display = "block";
     }
 }
+
 async function analyzeImage(){
 
 const result=document.getElementById('result');
@@ -167,38 +169,33 @@ alert("Please upload an image");
 return;
 }
 
-// 🔥 Loading UI
 result.innerHTML = `<div class="loading">⏳ Analyzing with AI...</div>`;
 
 let formData=new FormData();
 formData.append("file",file);
 
 try{
-const response=await fetch("https://cropguard-backend.onrender.com/predict", {
+const response=await fetch("https://cropguard-5.onrender.com/predict", {
 method:"POST",
 body:formData
 });
 
 const data=await response.json();
 
-// 🔥 Parse text
 const text=data.details || data.result;
 
-// Helper function
 function getSection(name){
 const regex=new RegExp(name+":([\\s\\S]*?)(?=\\n[A-Z]|$)");
 const match=text.match(regex);
 return match?match[1].trim():"Not available";
 }
 
-// Extract
 const disease=getSection("Disease");
 const symptoms=getSection("Symptoms");
 const causes=getSection("Causes");
 const treatment=getSection("Treatment");
 const prevention=getSection("Prevention");
 
-// 🔥 Show cards
 result.innerHTML=`
 <div class="result-card">
 <h3>🌿 Disease</h3>
@@ -232,6 +229,107 @@ result.innerHTML="❌ Error connecting to backend";
 }
 
 }
+
+/* ✅ NEW SEARCH FUNCTION */
+async function searchDisease(){
+
+const result=document.getElementById('result');
+const text=document.getElementById('searchInput').value;
+
+if(!text){
+alert("Please enter something");
+return;
+}
+
+// 🔥 Check if user is asking for diseases list
+if(text.toLowerCase().includes("disease")){
+
+result.innerHTML = `<div class="loading">⏳ Fetching diseases...</div>`;
+
+let formData=new FormData();
+
+// 🔥 Smart prompt
+formData.append("text", `
+User asked: "${text}"
+
+List common diseases of this crop.
+
+Format:
+Disease: <name>
+Symptoms: <short>
+`);
+
+try{
+const response=await fetch("https://cropguard-5.onrender.com/predict", {
+method:"POST",
+body:formData
+});
+
+const data=await response.json();
+const output=data.details || data.result;
+
+// 🔥 Convert to cards
+const diseases = output.split("Disease:");
+
+let html = "";
+
+diseases.forEach(d => {
+if(d.trim()){
+html += `
+<div class="result-card">
+<h3>🌿 ${d.split("\n")[0]}</h3>
+<p>${d.replace(/\n/g,"<br>")}</p>
+</div>
+`;
+}
+});
+
+result.innerHTML = html;
+
+}catch(err){
+result.innerHTML="❌ Error connecting to backend";
+}
+
+return;
+}
+
+// 🔥 NORMAL AI SEARCH (fallback)
+result.innerHTML = `<div class="loading">⏳ Analyzing...</div>`;
+
+let formData=new FormData();
+formData.append("text",text);
+
+try{
+const response=await fetch("https://cropguard-5.onrender.com/predict", {
+method:"POST",
+body:formData
+});
+
+const data=await response.json();
+if(!data||(!data.details && !data.results)){
+    result.innerHTML="❌ No results found";
+    return;
+}
+const output=data.details || data.result;
+
+result.innerHTML=`
+<div class="result-card">
+<h3>🔍 Result</h3>
+<p>${output}</p>
+</div>
+`;
+
+}catch(err){
+result.innerHTML="❌ Error connecting to backend";
+}
+}
+
+/* ✅ ENTER KEY SUPPORT */
+document.getElementById("searchInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        searchDisease();
+    }
+});
 </script>
 
 </body>
