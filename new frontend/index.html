@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CropGuard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+
+body{
+background:linear-gradient(135deg,#0f3d2e,#1b5e20);
+color:white;
+}
+
+/* NAV */
+nav{
+position:sticky;top:0;
+display:flex;justify-content:space-between;
+padding:15px 40px;
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(10px)
+}
+
+nav h2{display:flex;align-items:center;gap:10px}
+nav a{color:white;margin-left:20px;text-decoration:none}
+
+/* HERO */
+.hero{
+height:90vh;
+display:flex;flex-direction:column;
+justify-content:center;align-items:center;
+text-align:center;
+background:url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') center/cover;
+}
+
+/* SEARCH */
+.search-box{
+display:flex;
+background:white;
+border-radius:50px;
+padding:10px 20px;
+width:60%;
+color:black;
+}
+.search-box input{border:none;flex:1;outline:none}
+
+/* SECTIONS */
+.section{padding:60px 40px;text-align:center}
+
+/* CARDS */
+.cards{display:flex;gap:20px;justify-content:center}
+.card{
+background:rgba(255,255,255,0.1);
+padding:20px;
+border-radius:20px;
+width:250px
+}
+
+/* UPLOAD */
+.upload{
+border:2px dashed white;
+padding:40px;
+border-radius:20px
+}
+
+input,button{
+padding:10px;
+border-radius:10px;
+border:none;
+margin:10px 0
+}
+
+button{
+background:#4caf50;
+color:white;
+cursor:pointer
+}
+
+/* RESULT CARDS */
+#result{
+margin-top:30px;
+display:grid;
+gap:15px;
+}
+
+.result-card{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(10px);
+padding:20px;
+border-radius:15px;
+text-align:left;
+}
+
+.result-card h3{
+margin-bottom:8px;
+color:#a5d6a7;
+}
+
+.loading{
+font-size:18px;
+margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+<h2>🌿 CropGuard</h2>
+<div>
+<a href="#home">Home</a>
+<a href="#about">About</a>
+<a href="#login">Login</a>
+</div>
+</nav>
+
+<section class="hero" id="home">
+<h1>Your Smart Crop Health Assistant</h1>
+</section>
+
+<section class="section">
+<h2>Features</h2>
+<div class="cards">
+<div class="card">🔍 Diagnose Crop Problems</div>
+<div class="card">📸 Upload Plant Image</div>
+<div class="card">🌱 Get Smart Solutions</div>
+</div>
+</section>
+
+<section class="section">
+<h2>Upload Image</h2>
+
+<div class="upload">
+<input type="file" id="fileInput" onchange="previewImage(this)">
+<img id="preview" style="max-width:200px;margin-top:10px; display:none;">
+<button onclick="analyzeImage()">Detect Disease</button>
+</div>
+
+<div id="result"></div>
+
+</section>
+
+<section class="section" id="about">
+<h2>About CropGuard</h2>
+<p>CropGuard uses AI like Gemini to detect crop diseases and provide smart farming solutions.</p>
+</section>
+
+<script>
+function previewImage(){
+    const file = document.getElementById("fileInput").files[0];
+    const preview = document.getElementById("preview");
+    if (file){
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+    }
+}
+async function analyzeImage(){
+
+const result=document.getElementById('result');
+const file=document.getElementById('fileInput').files[0];
+
+if(!file){
+alert("Please upload an image");
+return;
+}
+
+// 🔥 Loading UI
+result.innerHTML = `<div class="loading">⏳ Analyzing with AI...</div>`;
+
+let formData=new FormData();
+formData.append("file",file);
+
+try{
+const response=await fetch("http://localhost:5000/predict",{
+method:"POST",
+body:formData
+});
+
+const data=await response.json();
+
+// 🔥 Parse text
+const text=data.details || data.result;
+
+// Helper function
+function getSection(name){
+const regex=new RegExp(name+":([\\s\\S]*?)(?=\\n[A-Z]|$)");
+const match=text.match(regex);
+return match?match[1].trim():"Not available";
+}
+
+// Extract
+const disease=getSection("Disease");
+const symptoms=getSection("Symptoms");
+const causes=getSection("Causes");
+const treatment=getSection("Treatment");
+const prevention=getSection("Prevention");
+
+// 🔥 Show cards
+result.innerHTML=`
+<div class="result-card">
+<h3>🌿 Disease</h3>
+<p>${disease}</p>
+</div>
+
+<div class="result-card">
+<h3>🟡 Symptoms</h3>
+<p>${symptoms}</p>
+</div>
+
+<div class="result-card">
+<h3>⚠️ Causes</h3>
+<p>${causes}</p>
+</div>
+
+<div class="result-card">
+<h3>💊 Treatment</h3>
+<p>${treatment}</p>
+</div>
+
+<div class="result-card">
+<h3>🛡️ Prevention</h3>
+<p>${prevention}</p>
+</div>
+`;
+
+}catch(err){
+console.error(err);
+result.innerHTML="❌ Error connecting to backend";
+}
+
+}
+</script>
+
+</body>
+</html>
