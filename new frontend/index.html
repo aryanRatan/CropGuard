@@ -26,6 +26,13 @@ backdrop-filter:blur(10px)
 nav h2{display:flex;align-items:center;gap:10px}
 nav a{color:rgb(0, 0, 0);margin-left:20px;text-decoration:none}
 
+/* ✅ Language dropdown */
+select{
+margin-left:20px;
+padding:5px 10px;
+border-radius:8px;
+border:none;
+}
 .hero{
 height:90vh;
 display:flex;flex-direction:column;
@@ -97,6 +104,23 @@ color:#a5d6a7;
 font-size:18px;
 margin-top:20px;
 }
+.spinner{
+width:40px;
+height:40px;
+border:4px solid rgba(255,255,255,0.3);
+border-top:4px solid #4caf50;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin:auto;
+}
+.high{border-left:6px solid red;}
+.medium{border-left:6px solid orange;}
+.low{border-left:6px solid green;}
+
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
 </style>
 </head>
 
@@ -108,6 +132,11 @@ margin-top:20px;
 <a href="#home">Home</a>
 <a href="#about">About</a>
 <a href="#login">Login</a>
+<!-- ✅ Language Option -->
+<select id="languageSelect" onchange="changeLanguage()">
+<option value="en">English</option>
+<option value="hi">हिंदी</option>
+</select>
 </div>
 </nav>
 
@@ -118,6 +147,7 @@ margin-top:20px;
 <div class="search-box">
 <input type="text" id="searchInput" placeholder="Search crop problems, diseases, or plant issues...">
 <button onclick="searchDisease()">🔍</button>
+<button onclick="startVoice()">🎤</button>
 </div>
 
 </section>
@@ -150,6 +180,32 @@ margin-top:20px;
 </section>
 
 <script>
+    function changeLanguage(){
+
+const lang = document.getElementById("languageSelect").value;
+
+const content = {
+    en: {
+        title: "Your Smart Crop Health Assistant",
+        features: "Features",
+        upload: "Upload Image",
+        about: "CropGuard uses AI like Gemini to detect crop diseases and provide smart farming solutions."
+    },
+    hi: {
+        title: "आपका स्मार्ट फसल स्वास्थ्य सहायक",
+        features: "विशेषताएँ",
+        upload: "छवि अपलोड करें",
+        about: "CropGuard एआई का उपयोग करके फसल रोगों का पता लगाता है और समाधान प्रदान करता है।"
+    }
+};
+
+// update text
+document.querySelector(".hero h1").innerText = content[lang].title;
+document.querySelector(".section h2").innerText = content[lang].features;
+document.querySelectorAll(".section h2")[1].innerText = content[lang].upload;
+document.querySelector("#about p").innerText = content[lang].about;
+
+}
 function previewImage(){
     const file = document.getElementById("fileInput").files[0];
     const preview = document.getElementById("preview");
@@ -168,8 +224,23 @@ if(!file){
 alert("Please upload an image");
 return;
 }
+function startVoice(){
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 
-result.innerHTML = `<div class="loading">⏳ Analyzing with AI...</div>`;
+recognition.lang = "en-IN";
+
+recognition.onresult = function(event){
+document.getElementById("searchInput").value = event.results[0][0].transcript;
+searchDisease();
+};
+
+recognition.start();
+}
+result.innerHTML = `
+<div class="loading">
+<div class="spinner"></div>
+<p>Analyzing with AI...</p>
+</div>`;
 
 let formData=new FormData();
 formData.append("file",file);
@@ -182,7 +253,26 @@ body:formData
 
 const data=await response.json();
 
-const text=data.details || data.result;
+let text = data.details || data.result;
+
+// 🌐 translate if Hindi selected
+const lang = document.getElementById("languageSelect").value;
+
+if(lang === "hi"){
+    text = await translateToHindi(text);
+}
+async function translateToHindi(text){
+    try{
+        const res = await fetch("https://cropguard-5.onrender.com/predict", {
+            method: "POST",
+            body: new FormData().append("text", "Translate to Hindi: " + text)
+        });
+        const data = await res.json();
+        return data.result || text;
+    }catch{
+        return text;
+    }
+}
 
 function getSection(name){
 const regex=new RegExp(name+":([\\s\\S]*?)(?=\\n[A-Z]|$)");
@@ -269,7 +359,7 @@ const data=await response.json();
 const output=data.details || data.result;
 
 // 🔥 Convert to cards
-const diseases = output.split("Disease:");
+const diseases = output.split("Disease:") : [];
 
 let html = "";
 
@@ -306,7 +396,7 @@ body:formData
 });
 
 const data=await response.json();
-if(!data||(!data.details && !data.results)){
+if(!data||(!data.details && !data.result)){
     result.innerHTML="❌ No results found";
     return;
 }
@@ -323,7 +413,16 @@ result.innerHTML=`
 result.innerHTML="❌ Error connecting to backend";
 }
 }
+let severity = "low";
 
+if(text.toLowerCase().includes("severe")) severity="high";
+else if(text.toLowerCase().includes("moderate")) severity="medium";
+
+result.innerHTML = `
+<div class="result-card ${severity}">
+<h3>🌿 Result</h3>
+<p>${text}</p>
+</div>`;
 /* ✅ ENTER KEY SUPPORT */
 document.getElementById("searchInput").addEventListener("keypress", function(e) {
     if (e.key === "Enter") {
