@@ -3,6 +3,7 @@ from flask_cors import CORS
 import requests
 import logging
 import base64
+import os
 
 app = Flask(__name__)
 CORS(app)
