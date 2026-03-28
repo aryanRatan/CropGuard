@@ -60,6 +60,7 @@ def predict():
             -short symptoms
             -treatment steps
             -prevention tips
+            -utilization(like if the diseased plant can be used for any purpose like biogas, compost etc.)
              A plant leaf is labeled as: {label}.
 
              Give output in this EXACT format:
@@ -81,6 +82,10 @@ def predict():
              Prevention:
              - tip 1
              - tip 2
+
+             Utilization:
+             - use 1
+             - use 2
 
              Keep it short and clean.
             """
